@@ -83,25 +83,25 @@ func TestContainsString(t *testing.T) {
 func TestExtractString(t *testing.T) {
 	p := Packet{[]byte{6, 0, 1, 'G', 'o', 0}}
 
-	if n, s := p.extractString(); s != "Go" || n != 3 {
+	if n, s := p.ExtractString(); s != "Go" || n != 3 {
 		t.Error("Expected string Go & 3, got", s, n)
 	}
 
 	p = Packet{[]byte{9, 0, 1, 'k', 'a', 'l', 0, 'a', 0}}
 
-	if _, s := p.extractString(); s != "kal" {
+	if _, s := p.ExtractString(); s != "kal" {
 		t.Error("Expected string kal, got", s)
 	}
 
 	p = Packet{[]byte{3, 0, 1}}
 
-	if n, s := p.extractString(); s != "" || n != 0 {
+	if n, s := p.ExtractString(); s != "" || n != 0 {
 		t.Error("Expected empty string & 0, got", s, n)
 	}
 
 	p = Packet{[]byte{4, 0, 1, 0}}
 
-	if n, s := p.extractString(); s != "" || n != 1 {
+	if n, s := p.ExtractString(); s != "" || n != 1 {
 		t.Error("Expected empty string & 1, got", s, n)
 	}
 }

@@ -1,16 +1,25 @@
 package server
 
 import (
+	"fmt"
 	"net"
 	"io"
 	"bufio"
-	"encoding/binary"
+//	"encoding/binary"
 	"github.com/satori/go.uuid"
 )
 
+type errorString struct {
+    s string
+}
+
+func (e *errorString) Error() string {
+    return e.s
+}
+
 type Server struct {
 	address	string
-	events map[byte]func(s *Session, p* Packet)
+	events map[string]func(s *Session, p* Packet)
 	sessions map[string]*Session
 	onConnected func(s *Session)
 	onDisconnected func(s *Session)
@@ -26,7 +35,7 @@ type Session struct {
 func New(address string) *Server {
 	return &Server{
 		address,
-		make(map[byte]func(s *Session, p *Packet)),
+		make(map[string]func(s *Session, p *Packet)),
 		make(map[string]*Session),
 		func(s *Session) {},
 		func(s *Session) {},
@@ -45,7 +54,7 @@ func (s *Server) OnUnknownPacket(callback func(s *Session, p *Packet)) {
 	s.onUnknownPacket = callback
 }
 
-func (s *Server) On(type_ byte, callback func(s *Session, p *Packet)) {
+func (s *Server) On(type_ string, callback func(s *Session, p *Packet)) {
 	s.events[type_] = callback
 }
 
@@ -84,7 +93,7 @@ func (s *Server) Start() error {
 		go s.listen(&Session{
 			conn,
 			bufio.NewReader(conn),
-			uuid.NewV4()})
+			uuid.Must(uuid.NewV4())})
 	}
 }
 
@@ -99,57 +108,44 @@ func (s *Server) listen(session *Session) {
 	}()
 
 	for {
-		packets, err := session.receive()
+		packet, err := session.receive()
 		if err != nil {
 			return
 		}
 
-		for _, p := range packets {
-			if event, ok := s.events[p.Type()]; ok {
-				event(session, p)
-			} else {
-				s.onUnknownPacket(session, p)
-			}
+		fmt.Printf("%v\n", packet.data)
+		fmt.Printf("%s\n", string(packet.data))
+		fmt.Printf("%s\n", packet.Type())
+
+		if event, ok := s.events[packet.Type()]; ok {
+			event(session, packet)
+		} else {
+			s.onUnknownPacket(session, packet)
 		}
 	}
 }
 
-func (s *Session) receive() ([]*Packet, error) {
+func (s *Session) receive() (*Packet, error) {
 	buffer := make([]byte, 1024)
-	packets := make([]*Packet, 0)
-
 	n, err := s.reader.Read(buffer)
+	fmt.Printf("Read data=%d\n", n)
 	if err == io.EOF || err != nil {
 		return nil, err
 	}
 
-	for n > 0 {
-		m := binary.LittleEndian.Uint16(buffer[:2])
-		if m == 0 {
-			m = 1
-		}
-		if m > 1024 {
-			m = 1024
-		}
-
-		p := ToPacket(buffer[:m])
-
-		n -= int(m)
-		buffer = append(buffer[m:], make([]byte, m)...)
-
-		if m < 3 {
-			continue
-		}
-
-		packets = append(packets, p)
+	if(buffer[0] != 0x28 || n > 1024 ||  buffer[n - 1] != 0x29) {
+		return nil, &errorString{"Wrong packet"};
 	}
 
-	return packets, nil
+	packet := ToPacket(buffer[:n])
+
+	return packet, nil
 }
 
-func (s *Session) Send(type_ byte, data ...interface{}) int {
-	p := NewPacket(type_)
+func (s *Session) Send(sn string, _type string, data ...interface{}) int {
+	p := NewPacket(sn, _type)
 	p.Write(data...)
+	p.EndPacket()
 	return s.SendPacket(p)
 }
 
@@ -158,9 +154,10 @@ func (s *Session) SendPacket(p *Packet) int {
 	return n
 }
 
-func (s *Server) Broadcast(type_ byte, data ...interface{}) {
-	p := NewPacket(type_)
+func (s *Server) Broadcast(sn string,  _type string, data ...interface{}) {
+	p := NewPacket(sn, _type)
 	p.Write(data...)
+	p.EndPacket()
 	s.BroadcastPacket(p)
 }
 
