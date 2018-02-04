@@ -21,6 +21,13 @@ func ProcessDeviceLogin(sn string, data string) {
 
 	if(db.Where("device_number = ?", sn).First(&device).RecordNotFound()) {
 		device = model.Device{DeviceNumber: sn, LastLoginAt:time.Now()}
+		if(gpsData != nil) {
+			device.Latitude = gpsData.Latitude
+			device.Longitude = gpsData.Longitude
+			device.Direction = gpsData.Direction
+			device.Speed = gpsData.Speed
+			device.Mileage = gpsData.Mileage
+		}
 		db.Create(&device)
 	} else {
 		device.LastLoginAt = time.Now() 
