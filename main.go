@@ -32,9 +32,10 @@ func main() {
 
   game.On("BP00", func(s *server.Session, p *server.Packet) {
     sn:=p.SN()
+    _, data:=p.ExtractString()
     fmt.Println("Sync:", sn)
 
-    s.Send(sn, "AP01", "HSO")
+    s.Send(sn, "AP01", data)
   })
 
   //login
