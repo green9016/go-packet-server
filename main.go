@@ -12,7 +12,7 @@ import (
 
 func main() {
   go api.StartApi();
-	game := server.New("localhost:3000")
+	game := server.New("0.0.0.0:3000")
 
   // Subscribe to connection event.
   game.OnConnected(func(s *server.Session) {
