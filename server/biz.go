@@ -112,6 +112,9 @@ func ProcessAlarm(sn string, data string) {
 }
 
 func ProcessGPSData(gpsStr string) (*model.GpsData, error){
+	if(len(gpsStr) == 0) {
+		return nil, nil
+	}
 	//sample data=080524A2232.9806N11404.9355E000.1101241323.8700000000L000450AC
 	var date = gpsStr[:6]
 	var avail = gpsStr[6:7]
