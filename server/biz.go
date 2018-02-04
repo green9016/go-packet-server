@@ -25,11 +25,13 @@ func ProcessDeviceLogin(sn string, data string) {
 	} else {
 		device.LastLoginAt = time.Now() 
 		//update gps data
-		device.Latitude = gpsData.Latitude
-		device.Longitude = gpsData.Longitude
-		device.Direction = gpsData.Direction
-		device.Speed = gpsData.Speed
-		device.Mileage = gpsData.Mileage
+		if(gpsData != nil) {
+			device.Latitude = gpsData.Latitude
+			device.Longitude = gpsData.Longitude
+			device.Direction = gpsData.Direction
+			device.Speed = gpsData.Speed
+			device.Mileage = gpsData.Mileage
+		}
 		db.Save(&device)
 	}
 
@@ -52,11 +54,13 @@ func ProcessLocation(sn string, data string) {
 		db.Create(&device)
 	} else {
 		//update gps data
-		device.Latitude = gpsData.Latitude
-		device.Longitude = gpsData.Longitude
-		device.Direction = gpsData.Direction
-		device.Speed = gpsData.Speed
-		device.Mileage = gpsData.Mileage
+		if(gpsData != nil) {
+			device.Latitude = gpsData.Latitude
+			device.Longitude = gpsData.Longitude
+			device.Direction = gpsData.Direction
+			device.Speed = gpsData.Speed
+			device.Mileage = gpsData.Mileage
+		}
 		db.Save(&device)
 	}
 
@@ -86,11 +90,13 @@ func ProcessAlarm(sn string, data string) {
 		db.Create(&device)
 	} else {
 		//update gps data
-		device.Latitude = gpsData.Latitude
-		device.Longitude = gpsData.Longitude
-		device.Direction = gpsData.Direction
-		device.Speed = gpsData.Speed
-		device.Mileage = gpsData.Mileage
+		if(gpsData != nil) {
+			device.Latitude = gpsData.Latitude
+			device.Longitude = gpsData.Longitude
+			device.Direction = gpsData.Direction
+			device.Speed = gpsData.Speed
+			device.Mileage = gpsData.Mileage
+		}
 		db.Save(&device)
 	}
 
