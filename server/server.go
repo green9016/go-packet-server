@@ -151,6 +151,7 @@ func (s *Session) Send(sn string, _type string, data ...interface{}) int {
 
 func (s *Session) SendPacket(p *Packet) int {
 	n, _ := s.conn.Write(p.Buffer())
+	fmt.Printf("Sent Data:%s, %d\n", string(p.Buffer()), n)
 	return n
 }
 
