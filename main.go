@@ -30,14 +30,21 @@ func main() {
     fmt.Println("Unknown packet:", p.Type())
   })
 
+  game.On("BP00", func(s *server.Session, p *server.Packet) {
+    sn:=p.SN()
+    fmt.Println("Sync:", sn)
+
+    s.Send(sn, "AP01", "HSO")
+  })
+
   //login
   game.On("BP05", func(s *server.Session, p *server.Packet) {
     sn:=p.SN()
     _, data:=p.ExtractString()
     fmt.Println("Login:", sn)
 
-    server.ProcessDeviceLogin(sn, data)
-    
+    go server.ProcessDeviceLogin(sn, data)
+    s.Send(sn, "AP05", "")
   })
 
   game.On("BO01", func(s *server.Session, p *server.Packet) {
@@ -46,6 +53,7 @@ func main() {
     fmt.Println("Alarm:", sn, data)
 
     server.ProcessAlarm(sn, data)
+    s.Send(sn, "AS01", data[0:1])
   })
 
   game.On("BR03", func(s *server.Session, p *server.Packet) {
