@@ -147,9 +147,9 @@ func ProcessGPSData(gpsStr string) (*model.GpsData, error){
 		}
 
 		if longitudeDir == "E" {
-			gpsData.Longitude =  (int)(longitudeF/100) + (longitudeF/100 - (int)(longitudeF/100)) * 100/ 60
+			gpsData.Longitude =  float64(int(longitudeF/100)) + (longitudeF/100 - float(int(longitudeF/100))) * 100/ 60
 		} else {
-			gpsData.Longitude = ((int)(longitudeF/100) + (longitudeF/100 - (int)(longitudeF/100)) * 100/ 60) * (-1)
+			gpsData.Longitude = (float64(int(longitudeF/100)) + (longitudeF/100 - float(int(longitudeF/100))) * 100/ 60) * (-1)
 		}
 
 		gpsData.Speed = speedF
