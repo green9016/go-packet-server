@@ -141,15 +141,15 @@ func ProcessGPSData(gpsStr string) (*model.GpsData, error){
 		orientationF, _ := strconv.ParseFloat(orientation, 64)
 		
 		if latitudeDir == "N" {
-			gpsData.Latitude = latitudeF/100
+			gpsData.Latitude = latitudeF/60
 		} else {
-			gpsData.Latitude = latitudeF/100 * (-1)
+			gpsData.Latitude = latitudeF/60 * (-1)
 		}
 
 		if longitudeDir == "E" {
-			gpsData.Longitude = longitudeF/100
+			gpsData.Longitude = longitudeF/60
 		} else {
-			gpsData.Longitude = longitudeF/100 * (-1)
+			gpsData.Longitude = longitudeF/60 * (-1)
 		}
 
 		gpsData.Speed = speedF
