@@ -141,9 +141,9 @@ func ProcessGPSData(gpsStr string) (*model.GpsData, error){
 		orientationF, _ := strconv.ParseFloat(orientation, 64)
 		
 		if latitudeDir == "N" {
-			gpsData.Latitude = (int)(latitudeF/100) + (latitudeF/100 - (int)(latitudeF/100)) * 100/ 60
+			gpsData.Latitude = float64(int(latitudeF/100)) + (latitudeF/100 - float(int(latitudeF/100))) * 100/ 60
 		} else {
-			gpsData.Latitude = ((int)(latitudeF/100) + (latitudeF/100 - (int)(latitudeF/100)) * 100/ 60) * (-1)
+			gpsData.Latitude = (float64(int(latitudeF/100)) + (latitudeF/100 - float(int(latitudeF/100))) * 100/ 60) * (-1)
 		}
 
 		if longitudeDir == "E" {
